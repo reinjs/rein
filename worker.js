@@ -10,7 +10,7 @@ module.exports = class WorkerRuntime extends Worker {
     this.$server = null;
     this.$inCluster = true;
     this.$events = new EventEmitter();
-    this.context.send = this.send.bin(this);
+    this.context.send = this.send.bind(this);
     this.context.sendback = this.sendback.bind(this);
   }
   
@@ -98,7 +98,7 @@ module.exports = class WorkerRuntime extends Worker {
     this.config.cwd = this.$app._argv.cwd;
     this.config.service = this.$app._argv.service;
     await this.initialize();
-    this.$server = await this.listen(this.config.service.port);
+    this.$server = await this.listen();
   }
   
   /**
