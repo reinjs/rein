@@ -1,0 +1,37 @@
+{
+  "name": "@reinjs/rein",
+  "version": "1.0.0",
+  "description": "rein framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=dev node test/index.js --service.name=rein-cluster-test --service.tag=dev --service.port=8080",
+    "pub": "npm publish --access=public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/reinjs/rein.git"
+  },
+  "keywords": [
+    "framework"
+  ],
+  "author": "reinjs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reinjs/rein/issues"
+  },
+  "homepage": "https://github.com/reinjs/rein#readme",
+  "dependencies": {
+    "@reinjs/rein-utils": "^1.0.0",
+    "is-type-of": "^1.2.0",
+    "koa": "^2.5.1",
+    "koa-router": "^7.4.0"
+  },
+  "devDependencies": {
+    "ys-pg-dbo": "^1.0.15",
+    "ys-pg-dbo-cache": "^1.0.19"
+  },
+  "plugin": {
+    "name": "b",
+    "dependencies": []
+  }
+}
