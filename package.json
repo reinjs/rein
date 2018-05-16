@@ -28,6 +28,7 @@
     "koa-router": "^7.4.0"
   },
   "devDependencies": {
+    "@reinjs/rein-cluster": "^1.0.1",
     "ys-pg-dbo": "^1.0.15",
     "ys-pg-dbo-cache": "^1.0.19"
   }
