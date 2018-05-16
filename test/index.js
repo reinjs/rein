@@ -1,7 +1,7 @@
 const Cluster = require('@reinjs/rein-cluster');
 const cluster = new Cluster({
   cwd: __dirname,
-  // agents: ['a', 'b', 'c', 'e'],
+  agents: ['book'],
   timeout: 10000,
   framework: '/Users/shenyunjie/CodeBox/reinjs/rein'
 });

@@ -1,3 +1,4 @@
+const is = require('is-type-of');
 const Worker = require('./lib/worker');
 const { EventEmitter } = require('async-events-listener');
 
@@ -83,7 +84,9 @@ module.exports = class WorkerRuntime extends Worker {
    * @returns {Promise<void>}
    */
   async message(msg) {
+    if (msg.action === 'cluster:ready') return await this._app.invoke('ready');
     if (!isNaN(msg.action)) {
+      if (!is.object(msg.body)) msg.body = { data: msg.body };
       if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);
       return;
     }
