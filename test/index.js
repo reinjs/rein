@@ -1,8 +1,9 @@
-const path = require('path');
-const Worker = require('../index').Worker;
-
-const app = new Worker({
-  cwd: __dirname
+const Cluster = require('@reinjs/rein-cluster');
+const cluster = new Cluster({
+  cwd: __dirname,
+  // agents: ['a', 'b', 'c', 'e'],
+  timeout: 10000,
+  framework: '/Users/shenyunjie/CodeBox/reinjs/rein'
 });
 
-app.listen(8080);
+cluster.listen().then(() => console.log('cluster is ok')).catch(e => console.error(e));

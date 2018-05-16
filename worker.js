@@ -1,11 +1,80 @@
 const Worker = require('./lib/worker');
+const { EventEmitter } = require('async-events-listener');
 
 module.exports = class WorkerRuntime extends Worker {
   constructor(app) {
     super();
+    this.$callbackId = 1;
+    this.$callbacks = {};
     this.$app = app;
     this.$server = null;
     this.$inCluster = true;
+    this.$events = new EventEmitter();
+    this.context.send = this.send.bin(this);
+    this.context.sendback = this.sendback.bind(this);
+  }
+  
+  /**
+   * receive a message
+   * @param args
+   * @returns {module.WorkerRuntime}
+   */
+  receive(...args) {
+    this.$events.on(...args);
+    return this;
+  }
+  
+  /**
+   * send a non-back message
+   * @param args
+   * @returns {module.WorkerRuntime}
+   */
+  send(...args) {
+    this.$app.send(...args);
+    return this;
+  }
+  
+  /**
+   * send a fallback message
+   * @param to
+   * @param event
+   * @param data
+   * @param timeout default: 3000
+   * @returns {Promise<any>}
+   */
+  sendback(to, event, data, timeout) {
+    return new Promise((resolve, reject) => {
+      let timer = null;
+      const time = Date.now();
+      const id = this.$callbackId++;
+      const receiver = (err, fallback) => {
+        clearInterval(timer);
+        delete this.$callbacks[id];
+        if (err) return reject(new Error(err));
+        resolve(fallback);
+      };
+      this.$callbacks[id] = receiver;
+  
+      /**
+       * send data structure
+       * action: <event>
+       * body:
+       *  __ipc_callback__: <id>
+       *  data: <data>
+       */
+      this.send(to, event, {
+        __ipc_callback__: id,
+        data
+      });
+      timeout = timeout || this.config.agent_timeout || 3000;
+      timer = setInterval(() => {
+        if (Date.now() - time > timeout) {
+          clearInterval(timer);
+          delete this.$callbacks[id];
+          reject(new Error(`timeout ${timeout}s: ${to}:${event}`));
+        }
+      }, 10);
+    });
   }
   
   /**
@@ -14,7 +83,11 @@ module.exports = class WorkerRuntime extends Worker {
    * @returns {Promise<void>}
    */
   async message(msg) {
-  
+    if (!isNaN(msg.action)) {
+      if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);
+      return;
+    }
+    await this.$events.emit(msg.action, msg.body);
   }
   
   /**
@@ -24,7 +97,8 @@ module.exports = class WorkerRuntime extends Worker {
   async create() {
     this.config.cwd = this.$app._argv.cwd;
     this.config.service = this.$app._argv.service;
-    this.$server = await this.listen();
+    await this.initialize();
+    this.$server = await this.listen(this.config.service.port);
   }
   
   /**
@@ -33,8 +107,8 @@ module.exports = class WorkerRuntime extends Worker {
    * @returns {Promise<void>}
    */
   async destroy(signal) {
-    if (this.$server) {
-      this.$server.close();
-    }
+    await this._app.invoke('beforeDestroy', signal);
+    this.$server.close();
+    await this._app.invoke('destroyed', signal);
   }
 };
