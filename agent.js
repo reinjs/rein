@@ -31,7 +31,7 @@ module.exports = class AgentRuntime extends Agent {
         this.send(msg.from, id, { error: res.message });
         return;
       }
-      this.send(msg.from, id, res);
+      this.send(msg.from, id, { data: res });
       return;
     }
     await this.emit(msg.action, msg.body);

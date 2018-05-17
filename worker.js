@@ -86,7 +86,6 @@ module.exports = class WorkerRuntime extends Worker {
   async message(msg) {
     if (msg.action === 'cluster:ready') return await this._app.invoke('ready');
     if (!isNaN(msg.action)) {
-      if (!is.object(msg.body)) msg.body = { data: msg.body };
       if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);
       return;
     }
