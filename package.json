@@ -1,6 +1,6 @@
 {
   "name": "@reinjs/rein",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "rein framework",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/reinjs/rein#readme",
   "dependencies": {
-    "@reinjs/rein-loader": "^1.0.1",
+    "@reinjs/rein-loader": "^1.0.2",
     "@reinjs/rein-utils": "^1.0.1",
     "async-events-listener": "^1.0.2",
     "is-type-of": "^1.2.0",
@@ -29,7 +29,7 @@
     "koa-router": "^7.4.0"
   },
   "devDependencies": {
-    "@reinjs/rein-cluster": "^1.0.1",
+    "@reinjs/rein-cluster": "^1.0.2",
     "ys-pg-dbo": "^1.0.15",
     "ys-pg-dbo-cache": "^1.0.19"
   }
