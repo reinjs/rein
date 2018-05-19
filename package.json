@@ -1,6 +1,6 @@
 {
   "name": "@reinjs/rein",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "rein framework",
   "main": "index.js",
   "scripts": {
