@@ -1,5 +1,11 @@
-module.exports = app => {
-  app.receive('test2', async data => {
-    return data + 'shenyunjie2';
-  });
+const Agent = require('@reinjs/rein-class/agent');
+
+module.exports = class Message extends Agent {
+  constructor(...args) {
+    super(...args);
+  }
+  
+  async test2(data) {
+    return data + 'shenyunjie3' + this.config.tet;
+  }
 };

@@ -4,9 +4,11 @@
 //   });
 // };
 
-module.exports = class Message {
-  constructor(app) {
-    this.app = app;
+const Agent = require('@reinjs/rein-class/agent');
+
+module.exports = class Message extends Agent {
+  constructor(...args) {
+    super(...args);
   }
   
   async test1(data) {
