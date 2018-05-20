@@ -13,6 +13,7 @@ module.exports = class WorkerRuntime extends Worker {
     this.$events = new EventEmitter();
     this.context.send = this.send.bind(this);
     this.context.sendback = this.sendback.bind(this);
+    this.context.error = this._app.error;
   }
   
   /**
