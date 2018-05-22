@@ -7,7 +7,7 @@ module.exports = class WorkerRuntime extends Worker {
     super();
     this.$callbackId = 1;
     this.$callbacks = {};
-    this.agentPluginmap = {};
+    this.agentPluginMap = {};
     this.$app = app;
     this.$server = null;
     this.$inCluster = true;
@@ -80,14 +80,32 @@ module.exports = class WorkerRuntime extends Worker {
     });
   }
   
-  _fetchAgentPlugins(name, plugins = []) {
+  /**
+   * 触发agent插件列表事件
+   * @param name
+   * @param plugins
+   * @returns {Promise<void>}
+   * @private
+   */
+  async _fetchAgentPlugins(name, plugins = []) {
     plugins.forEach(plugin => {
-      if (!this.agentPluginmap[plugin]) this.agentPluginmap[plugin] = [];
-      const index = this.agentPluginmap[plugin].indexOf(name);
+      if (!this.agentPluginMap[plugin]) this.agentPluginMap[plugin] = [];
+      const index = this.agentPluginMap[plugin].indexOf(name);
       if (index === -1) {
-        this.agentPluginmap[plugin].push(name);
+        this.agentPluginMap[plugin].push(name);
       }
     });
+    await this._app.invoke('notify');
+  }
+  
+  /**
+   * 已被agent通知插件列表事件
+   * @param fn
+   * @returns {module.WorkerRuntime}
+   */
+  notify(fn) {
+    this._app._pushLifeCycle('notify', fn);
+    return this;
   }
   
   /**
