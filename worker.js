@@ -7,6 +7,7 @@ module.exports = class WorkerRuntime extends Worker {
     super();
     this.$callbackId = 1;
     this.$callbacks = {};
+    this.$plugins = {};
     this.$app = app;
     this.$server = null;
     this.$inCluster = true;
@@ -79,12 +80,23 @@ module.exports = class WorkerRuntime extends Worker {
     });
   }
   
+  _fetchAgentPlugins(name, plugins = []) {
+    plugins.forEach(plugin => {
+      if (!this.$plugins[plugin]) this.$plugins[plugin] = [];
+      const index = this.$plugins[plugin].indexOf(name);
+      if (index === -1) {
+        this.$plugins[plugin].push(name);
+      }
+    });
+  }
+  
   /**
    * receive message from upstream
    * @param msg
    * @returns {Promise<void>}
    */
   async message(msg) {
+    if (msg.action = 'agent:plugins') return await this._fetchAgentPlugins(msg.body.name, msg.body.plugins);
     if (msg.action === 'cluster:ready') return await this._app.invoke('ready');
     if (!isNaN(msg.action)) {
       if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);

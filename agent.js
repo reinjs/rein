@@ -54,6 +54,10 @@ module.exports = class AgentRuntime extends Agent {
     this.config.cwd = this.$app._argv.cwd;
     this.config.service = this.$app._argv.service;
     await this.listen();
+    this.send('workers', 'agent:plugins', {
+      name: this.name,
+      plugins: Object.keys(this.plugins)
+    })
   }
   
   /**
