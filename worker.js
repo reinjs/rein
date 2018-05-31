@@ -81,40 +81,11 @@ module.exports = class WorkerRuntime extends Worker {
   }
   
   /**
-   * 触发agent插件列表事件
-   * @param name
-   * @param plugins
-   * @returns {Promise<void>}
-   * @private
-   */
-  async _fetchAgentPlugins(name, plugins = []) {
-    plugins.forEach(plugin => {
-      if (!this.agentPluginMap[plugin]) this.agentPluginMap[plugin] = [];
-      const index = this.agentPluginMap[plugin].indexOf(name);
-      if (index === -1) {
-        this.agentPluginMap[plugin].push(name);
-      }
-    });
-    await this._app.invoke('notify');
-  }
-  
-  /**
-   * 已被agent通知插件列表事件
-   * @param fn
-   * @returns {module.WorkerRuntime}
-   */
-  notify(fn) {
-    this._app._pushLifeCycle('notify', fn);
-    return this;
-  }
-  
-  /**
    * receive message from upstream
    * @param msg
    * @returns {Promise<void>}
    */
   async message(msg) {
-    if (msg.action === 'agent:plugins') return await this._fetchAgentPlugins(msg.body.name, msg.body.plugins);
     if (msg.action === 'cluster:ready') return await this._app.invoke('ready');
     if (!isNaN(msg.action)) {
       if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);
@@ -130,6 +101,11 @@ module.exports = class WorkerRuntime extends Worker {
   async create() {
     this.config.cwd = this.$app._argv.cwd;
     this.config.service = this.$app._argv.service;
+    if (this.$app._argv.agent && is.string(this.$app._argv.agent.extra)) {
+      this.config.agent = {
+        extra: JSON.parse(this.$app._argv.agent.extra)
+      }
+    }
     await this.initialize();
     this.$server = await this.listen();
   }

@@ -43,7 +43,7 @@ module.exports = class AgentRuntime extends Agent {
       this.send(msg.from, id, { data: res });
       return;
     }
-    await this.emit(msg.action, msg.body);
+    await this._exec(msg.action, msg.body).catch(e => Promise.resolve(e));
   }
   
   /**
@@ -51,13 +51,13 @@ module.exports = class AgentRuntime extends Agent {
    * @returns {Promise<void>}
    */
   async create() {
-    this.ready(() => this.send('workers', 'agent:plugins', {
-      name: this.name,
-      plugins: Object.keys(this.plugins)
-    }));
     this.config.cwd = this.$app._argv.cwd;
     this.config.service = this.$app._argv.service;
     await this.listen();
+  }
+  
+  extra() {
+    return Object.keys(this.plugins);
   }
   
   /**

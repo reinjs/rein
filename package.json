@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/reinjs/rein#readme",
   "dependencies": {
-    "@reinjs/rein-loader": "^1.0.3",
+    "@reinjs/rein-loader": "^1.0.4",
     "@reinjs/rein-utils": "^1.0.1",
     "async-events-listener": "^1.0.2",
     "is-type-of": "^1.2.0",
