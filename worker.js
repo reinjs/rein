@@ -1,13 +1,13 @@
 const is = require('is-type-of');
 const Worker = require('./lib/worker');
 const { EventEmitter } = require('async-events-listener');
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 module.exports = class WorkerRuntime extends Worker {
   constructor(app) {
     super();
     this.$callbackId = 1;
     this.$callbacks = {};
-    this.agentPluginMap = {};
     this.$app = app;
     this.$server = null;
     this.$inCluster = true;
@@ -104,7 +104,8 @@ module.exports = class WorkerRuntime extends Worker {
     if (this.$app._argv.agent && is.string(this.$app._argv.agent.extra)) {
       this.config.agent = {
         extra: JSON.parse(this.$app._argv.agent.extra)
-      }
+      };
+      this.config.agent.plugins = extraPlugins(this.config.agent.extra);
     }
     await this.initialize();
     this.$server = await this.listen();
@@ -121,3 +122,20 @@ module.exports = class WorkerRuntime extends Worker {
     await this._app.invoke('destroyed', signal);
   }
 };
+
+function extraPlugins(extra) {
+  const res = {};
+  for (const agent in extra) {
+    if (hasOwnProperty.call(extra, agent)) {
+      const plugins = extra[agent];
+      if (is.array(plugins)) {
+        plugins.forEach(plugin => {
+          if (!res[plugin]) res[plugin] = [];
+          const index = res[plugin].indexOf(agent);
+          if (index === -1) res[plugin].push(agent);
+        });
+      }
+    }
+  }
+  return res;
+}
