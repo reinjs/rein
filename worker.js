@@ -15,6 +15,14 @@ module.exports = class WorkerRuntime extends Worker {
     this.context.send = this.send.bind(this);
     this.context.sendback = this.sendback.bind(this);
     this.context.error = this._app.error;
+    process.on('message', (name, socket) => {
+      if (name === 'sticky:balance') {
+        if (this.$server) {
+          this.$server.emit('connection', socket);
+          socket.resume();
+        }
+      }
+    });
   }
   
   /**
@@ -85,7 +93,7 @@ module.exports = class WorkerRuntime extends Worker {
    * @param msg
    * @returns {Promise<void>}
    */
-  async message(msg) {
+  async message(msg, socket) {
     if (msg.action === 'cluster:ready') return await this._app.invoke('ready');
     if (!isNaN(msg.action)) {
       if (this.$callbacks[msg.action]) await this.$callbacks[msg.action](msg.body.error, msg.body.data);
