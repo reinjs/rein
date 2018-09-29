@@ -37,7 +37,7 @@ module.exports = class AgentRuntime extends Agent {
       const id = msg.body.__ipc_callback__;
       const res = await this._exec(msg.action, msg.body.data).catch(e => Promise.resolve(e));
       if (is.error(res)) {
-        this.send(msg.from, id, { error: res.message });
+        this.send(msg.from, id, { error: res.message, status: res.status || res.code });
         return;
       }
       this.send(msg.from, id, { data: res });
