@@ -61,7 +61,7 @@ module.exports = class WorkerRuntime extends Worker {
       const receiver = (err, fallback) => {
         clearInterval(timer);
         delete this.$callbacks[id];
-        if (err) return reject(new Error(err));
+        if (err) return reject(err);
         resolve(fallback);
       };
       this.$callbacks[id] = receiver;
