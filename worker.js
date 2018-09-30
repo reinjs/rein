@@ -25,6 +25,10 @@ module.exports = class WorkerRuntime extends Worker {
     });
   }
   
+  teardown() {
+    this.send('master', 'teardown');
+  }
+  
   /**
    * receive a message
    * @param args

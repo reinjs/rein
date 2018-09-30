@@ -7,6 +7,10 @@ module.exports = class AgentRuntime extends Agent {
     this.$app = app;
   }
   
+  teardown() {
+    this.send('master', 'teardown');
+  }
+  
   /**
    * send message
    * @param args
